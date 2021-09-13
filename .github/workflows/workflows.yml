@@ -14,5 +14,5 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: ${{ matrix.java-version }}
-      - name: Maven Package
-        run: mvn clean install -DskipTests
+      - name: Maven Install
+        run: mvn clean install
