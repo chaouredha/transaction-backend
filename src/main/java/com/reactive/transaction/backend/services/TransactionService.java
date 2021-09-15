@@ -1,17 +1,16 @@
 package com.reactive.transaction.backend.services;
 
 import static java.time.Duration.ofMillis;
-import static java.time.Duration.ofSeconds;
 
-import java.time.Duration;
-
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
+import com.reactive.transaction.backend.domain.EventDTO;
 import com.reactive.transaction.backend.domain.SocieteDTO;
 import com.reactive.transaction.backend.domain.TransactionDTO;
 import com.reactive.transaction.backend.entities.Societe;
 import com.reactive.transaction.backend.entities.Transaction;
-import com.reactive.transaction.backend.repositories.SocieteRepository;
 import com.reactive.transaction.backend.repositories.TransactionRepository;
 
 import reactor.core.publisher.Flux;
@@ -20,9 +19,12 @@ import reactor.core.publisher.Mono;
 @Service
 public class TransactionService {
     private final TransactionRepository transactionRepository;
+    private final WebClient webClient;
 
-    public TransactionService(TransactionRepository transactionRepository) {
+    public TransactionService(TransactionRepository transactionRepository,
+            @Qualifier("webClient") WebClient webClient) {
         this.transactionRepository = transactionRepository;
+        this.webClient = webClient;
     }
 
     public Flux<TransactionDTO> transactions() {
@@ -92,5 +94,20 @@ public class TransactionService {
         return transactionRepository.findBySocieteId(id)
                 .map(this::mapTransaction)
                 .delayElements(ofMillis(200));
+    }
+
+    public Flux<EventDTO> events(String id) {
+        Flux<EventDTO> eventsTransaction = transactionSocieteStream(id)
+                .map(transaction -> new EventDTO(
+                        transaction.getDate(),
+                        transaction.getId(),
+                        transaction.getPrice()
+                ));
+        Flux<EventDTO> events = webClient
+                .get()
+                .uri("/event/stream-events/" + id)
+                .retrieve()
+                .bodyToFlux(EventDTO.class);
+        return Flux.merge(eventsTransaction, events);
     }
 }

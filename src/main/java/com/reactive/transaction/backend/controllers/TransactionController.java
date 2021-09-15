@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.reactive.transaction.backend.domain.EventDTO;
 import com.reactive.transaction.backend.domain.TransactionDTO;
 import com.reactive.transaction.backend.services.TransactionService;
 
@@ -68,5 +69,10 @@ public class TransactionController {
     @GetMapping(value = "/streamSociete/{id}", produces = TEXT_EVENT_STREAM_VALUE)
     Flux<TransactionDTO> transactionSocieteStream(@PathVariable String id) {
         return transactionService.transactionSocieteStream(id);
+    }
+
+    @GetMapping(value = "/events/{id}", produces = TEXT_EVENT_STREAM_VALUE)
+    public Flux<EventDTO> events(@PathVariable String id) {
+        return transactionService.events(id);
     }
 }
