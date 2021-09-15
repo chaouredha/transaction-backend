@@ -2,3 +2,8 @@ spring:
   data:
     mongodb:
       uri: mongodb+srv://reactive-backend:reactive-backend@cluster0.plvrr.mongodb.net/db_bourse_test
+
+
+apis:
+  url:
+    event: http://localhost:8082
