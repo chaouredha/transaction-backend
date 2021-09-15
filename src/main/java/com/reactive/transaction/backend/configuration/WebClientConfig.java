@@ -16,6 +16,8 @@ public class WebClientConfig {
 
     @Bean("webClient")
     public WebClient webClient() {
-        return WebClient.create(urlApiEvents);
+        return WebClient.builder()
+                .baseUrl(urlApiEvents)
+                .build();
     }
 }

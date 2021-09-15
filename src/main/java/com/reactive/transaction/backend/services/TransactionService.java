@@ -105,7 +105,10 @@ public class TransactionService {
                 ));
         Flux<EventDTO> events = webClient
                 .get()
-                .uri("/event/stream-events/" + id)
+                .uri(uriBuilder ->
+                        uriBuilder.path("/event/stream-events/{id}")
+                                .build(id)
+                )
                 .retrieve()
                 .bodyToFlux(EventDTO.class);
         return Flux.merge(eventsTransaction, events);
