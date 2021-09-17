@@ -105,9 +105,11 @@ public class TransactionService {
                 ));
         Flux<EventDTO> events = webClient
                 .get()
-                .uri(uriBuilder ->
-                        uriBuilder.path("/event/stream-events/{id}")
-                                .build(id)
+                .uri(uriBuilder -> uriBuilder
+                        .pathSegment("event")
+                        .pathSegment("stream-events")
+                        .path("{id}")
+                        .build(id)
                 )
                 .retrieve()
                 .bodyToFlux(EventDTO.class);
